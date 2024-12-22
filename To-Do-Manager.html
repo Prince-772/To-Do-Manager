@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="icon" type="image/ico" sizes="32x32" href="./Expense Maneger/Logo.jpg">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: start;
+      height: 100vh;
+      margin: 0;
+      padding: 20px 0 0 0;
+      transition: all 500ms cubic-bezier(0.64, 0.38, 0, 1.34);
+    }
+
+    body.dark {
+      background-color: rgb(34, 34, 34);
+    }
+
+    .todo-container {
+      background: rgb(255, 255, 255);
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      width: 350px;
+      text-align: center;
+      margin: 0 10px;
+      transition: all 500ms cubic-bezier(0.64, 0.38, 0, 1.34);
+      /* border: 2px solid red; */
+    }
+
+    .todo-container.dark {
+      background-color: rgb(34, 34, 34);
+      color: white;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2)
+    }
+
+    .input-section {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    #todo-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      font-size: 14px;
+      transition: all 500ms cubic-bezier(0.64, 0.38, 0, 1.34);
+    }
+
+    #todo-input.dark {
+      border-color: #7a7a7a;
+      background-color: rgb(31, 31, 31);
+      color: white;
+    }
+
+    #add-btn {
+      padding: 10px 12px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #add-btn:hover {
+      background-color: #218838;
+    }
+
+    #todo-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 20px 0 0;
+      max-height: 60vh;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    #todo-list li {
+      padding: 5px 5px 5px 0;
+      margin: 5px 0;
+      background: #c8c8c8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex;
+      color: black;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 500ms cubic-bezier(0.64, 0.38, 0, 1.34);
+    }
+
+    #todo-list li.dark {
+      background: #3a3a3a;
+      border: 1px solid #8f8f8f;
+      color: white;
+    }
+
+    #todo-list li .delete-btn {
+      background: #ff0019;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 5px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+
+    #todo-list li .edit-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 5px;
+      cursor: pointer;
+    }
+
+    #todo-list li button.delete-btn:hover {
+      background: #c82333;
+    }
+
+    #todo-list li button.edit-btn:hover {
+      background: #10a710;
+    }
+
+    .text-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    #todo-list li .text-area {
+      width: 100%;
+      margin: 0 5px 0 0;
+      text-align: left;
+      overflow-x: auto;
+      scrollbar-width: none;
+      white-space: nowrap;
+      /* word-break: ; */
+    }
+
+    .dark-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pointer {
+      cursor: pointer;
+    }
+
+    p.heading {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    @media (max-width:500px) {
+      p.heading {
+        font-size: 6.4vw;
+      }
+
+      .todo-container {
+        width: min(350px, calc(100vw - 20px));
+      }
+    }
+
+    hr.sep-text-btn {
+      margin: 0;
+      width: 0;
+      height: 22px;
+      border-width: 1px;
+      border-color: #000000;
+      transition: all 500ms cubic-bezier(0.64, 0.38, 0, 1.34)
+    }
+
+    hr.sep-text-btn.dark {
+      border-color: #ffffff;
+    }
+
+    .flex {
+      display: flex;
+      align-items: center;
+    }
+
+    input.done {
+      width: 22px;
+      height: 22px;
+      margin: 0 5px;
+      accent-color: rgb(0, 255, 0);
+      cursor: pointer;
+    }
+
+    .border {
+      border: 2px solid red;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .slider {
+      width: 44px;
+      height: 20px;
+      background-color: grey;
+      border-radius: 20px;
+      position: relative;
+      margin: 0 0 0 5px;
+      transition: all 500ms cubic-bezier(0.64, 0.38, 0, 1.34);
+      border: 1px solid rgb(0, 55, 255);
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background-color: rgb(0, 55, 255);
+      border-radius: 50%;
+      top: 2.2px;
+      left: 2px;
+      transition: all 500ms cubic-bezier(0.64, 0.38, 0, 1.34);
+    }
+
+    input#dark-mode:checked+.slider::before {
+      left: 26.4px;
+    }
+
+    input#dark-mode:checked+.slider {
+      background-color: rgb(70, 235, 0);
+      border-color: rgb(70, 255, 0);
+    }
+
+    label {
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="todo-container">
+    <div class="text-box">
+      <p class="heading">To-Do List</p>
+      <div class="dark-box">
+        <label for="dark-mode" class="flex pointer">Dark Mode
+          <input type="checkbox" id="dark-mode" name="dark-mode" class="hidden">
+          <div class="slider" tabindex="0" role="button"></div>
+        </label>
+      </div>
+    </div>
+    <div class="input-section">
+      <input type="text" id="todo-input" placeholder="Add A New Task">
+      <button id="add-btn" class="fa fa-add"></button>
+    </div>
+    <ul id="todo-list"></ul>
+  </div>
+
+  <script>
+    const input = document.getElementById('todo-input');
+    const checkbox_input = document.getElementById('dark-mode')
+    let todos = []
+    let taskId = 0
+
+    document.getElementById('add-btn').addEventListener('click', add_to_do);
+    input.addEventListener("keypress", () => { event.key === "Enter" ? add_to_do() : undefined })
+    function add_to_do() {
+      const taskText = input.value.trim();
+      if (taskText) {
+        taskId++
+        const list = document.getElementById('todo-list');
+        const listItem = document.createElement('li');
+
+        listItem.innerHTML = `
+            <input type="checkbox" class="done" name="done">
+            <div class="text-area">${taskText}</div>
+            <id style="display:none;">${taskId}</id>
+            <div class="flex">
+            <hr class="sep-text-btn">
+            <button class="delete-btn fa fa-trash"></button>
+            <button class="edit-btn fa fa-edit"></button>
+            </div>`;
+
+        list.appendChild(listItem);
+        let currenttask = {
+          "task": taskText,
+          "completed": false,
+          "id": taskId
+        }
+        todos.push(currenttask)
+        localStorage.setItem("todos--1", JSON.stringify(todos))
+        input.value = '';
+
+        listItem.querySelector('.delete-btn').addEventListener('click', () => delete_task(listItem))
+        listItem.querySelector('.edit-btn').addEventListener('click', () => edit_to_do(listItem))
+        listItem.querySelector(".done").addEventListener('change', () => done_or_not(listItem));
+        toggleDarkMode()
+        localStorage.setItem("todos--1", JSON.stringify(todos))
+      }
+    }
+    function delete_task(li) {
+      let id = li.querySelector("id").textContent //id of current task which we have to delete
+      todos = todos.filter(todo => todo.id != id) //remove from todos array
+      li.remove();
+      localStorage.setItem("todos--1", JSON.stringify(todos))
+    };
+    function edit_to_do(li) {
+      const text = li.querySelector('div.text-area').textContent;
+      delete_task(li)
+      input.value = text
+    }
+    function done_or_not(li) {
+      let check_done = li.querySelector(".done")
+      let id = li.querySelector("id").textContent
+      todos.forEach(todo => {
+        if (check_done.checked && todo.id == id) { todo.completed = true }
+        else if (!check_done.checked && todo.id == id) { todo.completed = false }
+      })
+      localStorage.setItem("todos--1", JSON.stringify(todos))
+    }
+    function loadtasks() {
+      if (localStorage.getItem("todos--1") && localStorage.getItem("todos--1") !== "[]") {
+        todos = JSON.parse(localStorage.getItem("todos--1"))
+        taskId = todos[todos.length - 1].id
+        let list = document.getElementById("todo-list")
+        todos.forEach(todo => {
+
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <input type="checkbox" class="done" name="done">
+            <div class="text-area">${todo.task}</div>
+            <id style="display:none;">${todo.id}</id>
+            <div class="flex">
+            <hr class="sep-text-btn">
+            <button class="delete-btn fa fa-trash"></button>
+            <button class="edit-btn fa fa-edit"></button>
+            </div>`;
+          listItem.querySelector('.delete-btn').addEventListener('click', () => delete_task(listItem))
+          listItem.querySelector('.edit-btn').addEventListener('click', () => edit_to_do(listItem))
+          listItem.querySelector(".done").addEventListener('change', () => done_or_not(listItem));
+          list.appendChild(listItem)
+          let completed = todo.completed
+          if (completed) {
+            listItem.querySelector('.done').checked = true
+          }
+        })
+      }
+    }
+
+    checkbox_input.addEventListener('change', toggleDarkMode)
+    document.querySelector('.slider').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        const checkbox = document.getElementById('dark-mode');
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change'));
+      }
+    });
+
+    function toggleDarkMode() {
+      const checkbox = document.querySelector("#dark-mode")
+
+      const body = document.body;
+      const todoContainer = document.querySelector('.todo-container');
+      const input = document.getElementById('todo-input');
+      const hrs = Array.from(document.querySelectorAll('hr.sep-text-btn'))
+      const lis = Array.from(document.querySelectorAll('#todo-list li'));
+
+
+      if (checkbox.checked) {
+        body.classList.add('dark');
+        todoContainer.classList.add('dark');
+        input.classList.add('dark');
+        lis.forEach(li => {
+          li.classList.add('dark')
+        });;
+        hrs.forEach(hr => {
+          hr.classList.add('dark')
+        });;
+
+      } else {
+        body.classList.remove('dark');
+        todoContainer.classList.remove('dark');
+        input.classList.remove('dark');
+        lis.forEach(li => {
+          li.classList.remove('dark')
+        });;
+        hrs.forEach(hr => {
+          hr.classList.remove('dark')
+        });;
+      }
+    }
+    loadtasks()
+    checkbox_input.checked = true //checked by default
+    toggleDarkMode() //bydefault dark mode
+  </script>
+</body>
+
+</html>
