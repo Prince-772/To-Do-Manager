@@ -21,7 +21,7 @@
       height: 100vh;
       margin: 0;
       padding: 20px 0 0 0;
-      transition: all 500ms ease-out;
+      transition: all 300ms ease-out;
     }
 
     body.dark {
@@ -36,8 +36,9 @@
       width: 350px;
       text-align: center;
       margin: 0 10px;
-      transition: background-color 500ms ease-out, color 500ms ease-out, max-height 100ms ease-out;
-      /* border: 2px solid red; */
+      height: 154px;
+      transition: all 300ms ease-out;
+
     }
 
     .todo-container.dark {
@@ -59,7 +60,7 @@
       border-radius: 4px;
       outline: none;
       font-size: 14px;
-      transition: all 500ms ease-out;
+      transition: all 300ms ease-out;
     }
 
     #todo-input.dark {
@@ -93,6 +94,7 @@
     #todo-list li {
       padding: 5px 5px 5px 0;
       margin: 5px 0;
+      max-height: 34.9375px;
       background: #c8c8c8;
       border: 1px solid #ddd;
       border-radius: 4px;
@@ -100,7 +102,7 @@
       color: black;
       justify-content: space-between;
       align-items: center;
-      transition: background-color 500ms ease-out, color 500ms ease-out, transform 100ms ease-out, opacity 100ms ease-out;
+      transition: all 300ms ease-out;
     }
 
     #todo-list li.dark {
@@ -177,6 +179,10 @@
       .todo-container {
         width: min(350px, calc(100vw - 20px));
       }
+
+      .msg {
+        font-size: 0.9em;
+      }
     }
 
     hr.sep-text-btn {
@@ -185,7 +191,7 @@
       height: 22px;
       border-width: 1px;
       border-color: #000000;
-      transition: all 500ms ease-out
+      transition: all 300ms ease-out
     }
 
     hr.sep-text-btn.dark {
@@ -220,7 +226,7 @@
       border-radius: 20px;
       position: relative;
       margin: 0 0 0 5px;
-      transition: all 500ms ease-out;
+      transition: all 300ms ease-out;
       border: 1px solid rgb(0, 55, 255);
     }
 
@@ -233,7 +239,7 @@
       border-radius: 50%;
       top: 2.2px;
       left: 2px;
-      transition: all 500ms cubic-bezier(0.64, 0.38, 0, 1.34);
+      transition: all 300ms cubic-bezier(0.64, 0.38, 0, 1.34);
     }
 
     input#dark-mode:checked+.slider::before {
@@ -250,13 +256,13 @@
     }
 
     .animate-delete {
-      transform: translateX(-100px);
-      opacity: 0;
+      animation: delete 300ms ease 0s 1;
+      overflow: hidden;
     }
 
     .animate-edit {
-      transform: translateY(-100px);
-      opacity: 0;
+      animation: edit 300ms ease 0s 1;
+      overflow: hidden;
     }
 
     .msg {
@@ -272,6 +278,45 @@
 
     p.msg-text {
       margin: 0;
+    }
+
+    @keyframes delete {
+      0% {
+        height: 34.9375px;
+        opacity: 1;
+        transform: translateX(0);
+        padding: 5px;
+        margin: 5px;
+        border-width: 1px;
+      }
+
+      100% {
+        height: -100px;
+        opacity: 0;
+        transform: translateX(-100px);
+        padding: 0;
+        margin: 0;
+        border-width: 0;
+      }
+    }
+    @keyframes edit {
+      0% {
+        height: 34.9375px;
+        opacity: 1;
+        transform: translateY(0);
+        padding: 5px;
+        margin: 5px;
+        border-width: 1px;
+      }
+
+      100% {
+        height: -100px;
+        opacity: 0;
+        transform: translateY(-100px);
+        padding: 0;
+        margin: 0;
+        border-width: 0;
+      }
     }
 
     @keyframes warn {
@@ -315,17 +360,19 @@
     const input = document.getElementById('todo-input');
     const cont = document.querySelector(".todo-container")
     const checkbox_input = document.getElementById('dark-mode')
+    const list = document.getElementById('todo-list');
     let todos = []
     let taskId = 0
+    let initial_height = cont.offsetHeight
+    let user_info = [{ "dark_mode": true }, { "height": initial_height }]
 
     document.getElementById('add-btn').addEventListener('click', add_to_do);
     input.addEventListener("keypress", () => { event.key === "Enter" ? add_to_do() : undefined })
 
-    async function add_to_do() {
+    function add_to_do() {
       const taskText = input.value.trim();
       if (taskText) {
         taskId++
-        const list = document.getElementById('todo-list');
         const listItem = document.createElement('li');
 
         listItem.innerHTML = `
@@ -337,12 +384,22 @@
             <button class="delete-btn fa fa-trash"></button>
             <button class="edit-btn fa fa-edit"></button>
             </div>`;
-        list.appendChild(listItem);
-        listItem.style.visibility = "hidden"
-        setTimeout(() => {
-          listItem.style.visibility = "visible";
-        }, 200)
-   
+
+        if (list.scrollHeight <= window.innerHeight * 0.6) {
+          setTimeout(() => {
+            listItem.style.visibility = "visible";
+            cont.classList.remove("add-animation")
+          }, 300)
+          cont.style.height = (initial_height + 39.938) + "px"
+          initial_height += 39.938
+          user_info[1].height = initial_height
+          localStorage.setItem("user-info-to-do--1", JSON.stringify(user_info))
+          list.appendChild(listItem);
+          listItem.style.visibility = "hidden"
+        } else {
+          list.appendChild(listItem);
+        }
+
         let currenttask = {
           "task": taskText,
           "completed": false,
@@ -357,16 +414,14 @@
         listItem.querySelector(".done").addEventListener('change', () => done_or_not(listItem));
         toggleDarkMode()
         localStorage.setItem("todos--1", JSON.stringify(todos))
-        animate_container()
       }
     }
     async function delete_task(li, edit = false) {
       let id = li.querySelector("id").textContent //id of current task which we have to delete
       if (edit) {
         if (input.value.trim() == "") {
-          const text = li.querySelector('div.text-area').textContent;
+          input.value = li.querySelector('div.text-area').textContent
           li.classList.add("animate-edit")
-          input.value = text
         }
         else {
           document.querySelector(".msg").style.visibility = "visible"
@@ -380,19 +435,21 @@
         }
       }
       else { li.classList.add("animate-delete") }
+      if ((list.scrollHeight - 39.938) <= window.innerHeight * 0.6) {
+        cont.style.height = (initial_height - 39.938) + "px"
+        initial_height -= 39.938
+        user_info[1].height = initial_height
+        localStorage.setItem("user-info-to-do--1", JSON.stringify(user_info))
+      }
       await new Promise(resolve => setTimeout(() => {
         li.remove()
-        cont.style.maxHeight = `${cont.offsetHeight}px` //updating the max-height
         resolve()
-      }, 200));
+      }, 250));
       todos = todos.filter(todo => todo.id != id) //remove from todos array
       localStorage.setItem("todos--1", JSON.stringify(todos))
     };
     function edit_to_do(li) {
       delete_task(li, true)
-    }
-    function animate_container() {
-      cont.style.maxHeight = `${cont.scrollHeight + 10}px`
     }
     function done_or_not(li) {
       let check_done = li.querySelector(".done")
@@ -430,8 +487,6 @@
           }
         })
       }
-      cont.style.maxHeight = `${cont.offsetHeight}px`
-      // cont.style.minHeight = `${cont.offsetHeight}px`
     }
 
     checkbox_input.addEventListener('change', toggleDarkMode)
@@ -443,7 +498,7 @@
         checkbox.dispatchEvent(new Event('change'));
       }
     });
-    
+
     function toggleDarkMode() {
       const checkbox = document.querySelector("#dark-mode")
 
@@ -455,6 +510,7 @@
 
 
       if (checkbox.checked) {
+        user_info[0].dark_mode = true
         body.classList.add('dark');
         todoContainer.classList.add('dark');
         input.classList.add('dark');
@@ -466,6 +522,7 @@
         });;
 
       } else {
+        user_info[0].dark_mode = false
         body.classList.remove('dark');
         todoContainer.classList.remove('dark');
         input.classList.remove('dark');
@@ -476,10 +533,30 @@
           hr.classList.remove('dark')
         });;
       }
+      localStorage.setItem("user-info-to-do--1", JSON.stringify(user_info))
     }
     loadtasks()
-    checkbox_input.checked = true //checked by default
-    toggleDarkMode() //bydefault dark mode
+    if (localStorage.getItem("user-info-to-do--1") && localStorage.getItem("user-info-to-do--1") !== "[]") {
+      user_info = JSON.parse(localStorage.getItem("user-info-to-do--1"))
+      if (user_info[0].dark_mode) {
+        checkbox_input.checked = true //checked if dark mode is enabled
+        toggleDarkMode() //dark mode
+      }
+      else {
+        checkbox_input.checked = false
+        toggleDarkMode()
+      }
+      if (user_info[1].height) {
+        initial_height = user_info[1].height
+        cont.style.height = `${initial_height}px`
+      }
+    }
+    else {
+      checkbox_input.checked = true //checked by default
+      toggleDarkMode() //bydefault dark mode
+      user_info[0].dark_mode = true
+      localStorage.setItem("user-info-to-do--1", JSON.stringify(user_info))
+    };
   </script>
 </body>
 
