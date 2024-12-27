@@ -1,7 +1,7 @@
 # To-Do Manager
 
 ## Overview
-This is a feature-rich and responsive to-do list application built with **HTML**, **CSS**, and **JavaScript**. The app includes functionalities like adding, editing, deleting tasks, and toggling between light and dark modes. All tasks are stored locally using `localStorage`, so your data is always saved.
+This is a feature-rich and responsive to-do list application built with **HTML**, **CSS**, and **JavaScript**. The app includes functionalities like adding, editing, deleting tasks, and toggling between light and dark modes and Arranging tasks through draging. All tasks are stored locally using `localStorage`, so your data is always saved.
 
 ---
 
@@ -11,6 +11,7 @@ This is a feature-rich and responsive to-do list application built with **HTML**
 - **Persistent Storage:** Your tasks are saved in `localStorage` and reload when you revisit the app.
 - **Animations:** Smooth fade-in animations for task additions.
 - **Responsive Design:** Fully optimized for desktop and mobile devices.
+- **Reorder Tasks By Drag:** Reorder tasks by dragging them up or down.
 
 ---
 
@@ -42,12 +43,12 @@ This is a feature-rich and responsive to-do list application built with **HTML**
 ### JavaScript
 - Efficient DOM manipulation.
 - Data persistence with `localStorage`.
-- Event listeners for task operations and theme toggle.
+- Event listeners for task operations, theme toggle and drag and drop functionality.
 
 ---
 
 ## Upcoming Features
-- Drag-and-drop functionality for reordering tasks.
+- Drag-and-drop functionality for reordering tasks (Added on 27/12/2024)
 - Integration with backend storage.
 
 ---

@@ -70,7 +70,7 @@
 
     #add-btn {
       padding: 10px 12px;
-      background-color: #28a745;
+      background-color: #0db033;
       color: white;
       border: none;
       border-radius: 4px;
@@ -259,6 +259,7 @@
       animation: add 300ms ease 0s 1;
       overflow: hidden;
     }
+
     .animate-delete {
       animation: delete 300ms ease 0s 1;
       overflow: hidden;
@@ -283,6 +284,7 @@
     p.msg-text {
       margin: 0;
     }
+
     @keyframes add {
       0% {
         height: 0;
@@ -324,6 +326,7 @@
         width: 0;
       }
     }
+
     @keyframes edit {
       0% {
         height: 34.9375px;
@@ -389,16 +392,25 @@
     let todos = []
     let taskId = 0
     let user_info = [{ "dark_mode": true }]
+    let dragging;
+    let startY = null;
 
     document.getElementById('add-btn').addEventListener('click', add_to_do);
-    input.addEventListener("keypress", () => { event.key === "Enter" ? add_to_do() : undefined })
+    input.addEventListener("keyup", e => {
+      if (event.key === "Enter") { add_to_do() }
+      input.value = input.value.trim()
+    })
+    list.addEventListener("dragstart", e => dragstart(e))
+    list.addEventListener("dragover", e => dragover(e))
+    list.addEventListener("drop", e => drop(e))
 
     function add_to_do() {
       const taskText = input.value.trim();
       if (taskText) {
         taskId++
         const listItem = document.createElement('li');
-
+        listItem.draggable = "true"
+        listItem.dataset.id = taskId
         listItem.innerHTML = `
             <input type="checkbox" class="done" name="done">
             <div class="text-area">${taskText}</div>
@@ -408,11 +420,11 @@
             <button class="delete-btn fa fa-trash"></button>
             <button class="edit-btn fa fa-edit"></button>
             </div>`;
-          list.appendChild(listItem);
-          listItem.classList.add("add-animate")
-          setTimeout(() => {
-            listItem.classList.remove("add-animate")
-          }, 250);
+        list.appendChild(listItem);
+        listItem.classList.add("add-animate")
+        setTimeout(() => {
+          listItem.classList.remove("add-animate")
+        }, 250);
         let currenttask = {
           "task": taskText,
           "completed": false,
@@ -467,6 +479,40 @@
       })
       localStorage.setItem("todos--1", JSON.stringify(todos))
     }
+    function dragstart(e) {
+      startY = e.clientY
+      dragging = e.target
+      dragging.style.opacity = "0.6"
+    }
+    function dragover(e) {
+      e.preventDefault()
+      let lis = Array.from(list.children)
+      let y = e.clientY + list.scrollTop
+      lis.forEach(li => {
+        let top = li.offsetTop
+        let bottom = top + li.offsetHeight
+        if (top < y && bottom > y && startY > y) {
+          list.insertBefore(dragging, li)
+        }
+        else if (top < y && bottom > y && startY < y) {
+          list.insertBefore(dragging, li.nextSibling)
+        }
+      })
+    }
+    function drop(e) {
+      dragging.style.opacity = "1"
+      dragging = null
+      updateArray()
+    }
+
+    function updateArray() {
+      let lis = Array.from(list.children)
+      let CorrectOrderID = lis.map(li => Number(li.dataset.id))
+      todos = CorrectOrderID.map(data_id => {
+        return todos.find(todo => todo.id === data_id)
+      })
+      localStorage.setItem("todos--1", JSON.stringify(todos))
+    }
     function loadtasks() {
       if (localStorage.getItem("todos--1") && localStorage.getItem("todos--1") !== "[]") {
         todos = JSON.parse(localStorage.getItem("todos--1"))
@@ -475,6 +521,8 @@
         todos.forEach(todo => {
 
           const listItem = document.createElement('li');
+          listItem.draggable = "true"
+          listItem.dataset.id = todo.id
           listItem.innerHTML = `
             <input type="checkbox" class="done" name="done">
             <div class="text-area">${todo.task}</div>
