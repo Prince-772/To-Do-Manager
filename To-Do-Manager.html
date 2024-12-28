@@ -523,6 +523,7 @@
           const listItem = document.createElement('li');
           listItem.draggable = "true"
           listItem.dataset.id = todo.id
+          todo.id>taskId?taskId=todo.id:taskId=taskId
           listItem.innerHTML = `
             <input type="checkbox" class="done" name="done">
             <div class="text-area">${todo.task}</div>
