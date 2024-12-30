@@ -407,6 +407,7 @@
     list.addEventListener("dragstart", e => dragstart(e))
     list.addEventListener("dragover", e => dragover(e))
     list.addEventListener("drop", e => drop(e))
+    list.addEventListener("dragend", e => drop(e));
 
     function add_to_do() {
       const taskText = input.value.trim();
