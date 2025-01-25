@@ -252,6 +252,7 @@ search_btn.addEventListener("click", () => {
     add_btn.disabled = false;
     Array.from(list.children).forEach((li) => (li.style.display = "flex"));
     input.placeholder = "Add A New Task";
+    input.value = ""
   }
 });
 input.addEventListener("input", HandleSearching);
